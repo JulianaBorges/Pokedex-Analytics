@@ -1,1 +1,1 @@
-# Pok-dex-Analytics
+# Pokédex-Analytics
