@@ -1,0 +1,56 @@
+name: Setup Pokédex Project Board
+
+on:
+  workflow_dispatch:   # permite rodar manualmente pelo GitHub Actions
+
+jobs:
+  setup-board:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Instalar GitHub CLI
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y gh
+
+      - name: Autenticar GitHub CLI
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          echo "${GITHUB_TOKEN}" | gh auth login --with-token
+
+      - name: Criar Projeto
+        run: |
+          gh project create \
+            --owner "seu-usuario" \
+            --title "Pokédex Analytics" \
+            --description "Projeto ágil para análise da PokéAPI" \
+            --template board
+
+      - name: Criar Colunas
+        run: |
+          gh project column create --project "Pokédex Analytics" --name "Backlog"
+          gh project column create --project "Pokédex Analytics" --name "To Do"
+          gh project column create --project "Pokédex Analytics" --name "In Progress"
+          gh project column create --project "Pokédex Analytics" --name "Review"
+          gh project column create --project "Pokédex Analytics" --name "Done"
+
+      - name: Criar Milestones
+        run: |
+          gh milestone create --title "Sprint 1 – Coleta & Estruturação" --due-on "2026-05-31"
+          gh milestone create --title "Sprint 2 – Análise Exploratória" --due-on "2026-06-30"
+          gh milestone create --title "Sprint 3 – Análise Avançada" --due-on "2026-07-31"
+          gh milestone create --title "Sprint 4 – Visualização & Storytelling" --due-on "2026-08-31"
+
+      - name: Criar Issues
+        run: |
+          gh issue create --title "Conectar à PokéAPI" --body "Script para coletar dados dos 150 Pokémon" --milestone "Sprint 1 – Coleta & Estruturação"
+          gh issue create --title "Estruturar tabelas" --body "Normalizar dados em Pokémon, Stats, Tipos, Habilidades" --milestone "Sprint 1 – Coleta & Estruturação"
+          gh issue create --title "Definir métrica de força" --body "HP + Ataque + Defesa" --milestone "Sprint 2 – Análise Exploratória"
+          gh issue create --title "Explorar correlação peso/altura vs stats" --body "Scatter plot e análise estatística" --milestone "Sprint 2 – Análise Exploratória"
+          gh issue create --title "Clusterizar Pokémon" --body "Usar K-means ou DBSCAN" --milestone "Sprint 3 – Análise Avançada"
+          gh issue create --title "Criar grafo de habilidades" --body "Usar NetworkX para mapear habilidades compartilhadas" --milestone "Sprint 3 – Análise Avançada"
+          gh issue create --title "Dashboard interativo" --body "Power BI, Tableau ou Plotly" --milestone "Sprint 4 – Visualização & Storytelling"
+          gh issue create --title "Documentar insights" --body "Relatório final com storytelling" --milestone "Sprint 4 – Visualização & Storytelling"
