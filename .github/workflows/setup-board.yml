@@ -15,26 +15,6 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gh
 
-      - name: Criar Projeto
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh project create \
-            --owner ${{ github.repository_owner }} \
-            --title "Pokédex Analytics" \
-            --description "Projeto ágil para análise da PokéAPI" \
-            --template board
-
-      - name: Criar Colunas
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh project column create --project "Pokédex Analytics" --name "Backlog"
-          gh project column create --project "Pokédex Analytics" --name "To Do"
-          gh project column create --project "Pokédex Analytics" --name "In Progress"
-          gh project column create --project "Pokédex Analytics" --name "Review"
-          gh project column create --project "Pokédex Analytics" --name "Done"
-
       - name: Criar Milestones
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
