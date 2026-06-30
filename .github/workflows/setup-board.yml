@@ -1,7 +1,7 @@
 name: Setup Pokédex Project Board
 
 on:
-  workflow_dispatch:   # permite rodar manualmente pelo GitHub Actions
+  workflow_dispatch:   # você roda manualmente pelo GitHub Actions
 
 jobs:
   setup-board:
@@ -15,21 +15,19 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y gh
 
-      - name: Autenticar GitHub CLI
+      - name: Criar Projeto
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          echo "${GITHUB_TOKEN}" | gh auth login --with-token
-
-      - name: Criar Projeto
-        run: |
           gh project create \
-            --owner "seu-usuario" \
+            --owner ${{ github.repository_owner }} \
             --title "Pokédex Analytics" \
             --description "Projeto ágil para análise da PokéAPI" \
             --template board
 
       - name: Criar Colunas
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh project column create --project "Pokédex Analytics" --name "Backlog"
           gh project column create --project "Pokédex Analytics" --name "To Do"
@@ -38,6 +36,8 @@ jobs:
           gh project column create --project "Pokédex Analytics" --name "Done"
 
       - name: Criar Milestones
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh milestone create --title "Sprint 1 – Coleta & Estruturação" --due-on "2026-05-31"
           gh milestone create --title "Sprint 2 – Análise Exploratória" --due-on "2026-06-30"
@@ -45,6 +45,8 @@ jobs:
           gh milestone create --title "Sprint 4 – Visualização & Storytelling" --due-on "2026-08-31"
 
       - name: Criar Issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           gh issue create --title "Conectar à PokéAPI" --body "Script para coletar dados dos 150 Pokémon" --milestone "Sprint 1 – Coleta & Estruturação"
           gh issue create --title "Estruturar tabelas" --body "Normalizar dados em Pokémon, Stats, Tipos, Habilidades" --milestone "Sprint 1 – Coleta & Estruturação"
