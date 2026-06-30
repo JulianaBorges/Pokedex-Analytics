@@ -19,11 +19,10 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue milestone create --title "Sprint 1 – Coleta & Estruturação" --due-on "2026-05-31"
-          gh issue milestone create --title "Sprint 2 – Análise Exploratória" --due-on "2026-06-30"
-          gh issue milestone create --title "Sprint 3 – Análise Avançada" --due-on "2026-07-31"
-          gh issue milestone create --title "Sprint 4 – Visualização & Storytelling" --due-on "2026-08-31"
-
+          gh milestone create --title "Sprint 1 – Coleta & Estruturação" --due-on "2026-05-31"
+          gh milestone create --title "Sprint 2 – Análise Exploratória" --due-on "2026-06-30"
+          gh milestone create --title "Sprint 3 – Análise Avançada" --due-on "2026-07-31"
+          gh milestone create --title "Sprint 4 – Visualização & Storytelling" --due-on "2026-08-31"
 
       - name: Criar Issues
         env:
