@@ -1,38 +1,109 @@
-name: Setup Pokédex Project Board
+name: Setup Pokédex Project
 
 on:
-  workflow_dispatch:   # você roda manualmente pelo GitHub Actions
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
 
 jobs:
-  setup-board:
+  setup:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - name: Checkout
+        uses: actions/checkout@v4
 
-      - name: Instalar GitHub CLI
+      - name: Authenticate GitHub CLI
         run: |
-          sudo apt-get update
-          sudo apt-get install -y gh
+          echo "${{ secrets.GITHUB_TOKEN }}" | gh auth login --with-token
 
-      - name: Criar Milestones
+      - name: Create Labels
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh milestone create --title "Sprint 1 – Coleta & Estruturação" --due-on "2026-05-31"
-          gh milestone create --title "Sprint 2 – Análise Exploratória" --due-on "2026-06-30"
-          gh milestone create --title "Sprint 3 – Análise Avançada" --due-on "2026-07-31"
-          gh milestone create --title "Sprint 4 – Visualização & Storytelling" --due-on "2026-08-31"
 
-      - name: Criar Issues
+          create_label () {
+            gh label create "$1" \
+              --description "$2" \
+              --color "$3" || true
+          }
+
+          create_label "api" "API Integration" "0E8A16"
+          create_label "powerbi" "Power BI" "1D76DB"
+          create_label "python" "Python Scripts" "3776AB"
+          create_label "etl" "ETL Process" "F9D71C"
+          create_label "documentation" "Documentation" "5319E7"
+          create_label "enhancement" "New Feature" "84B6EB"
+          create_label "bug" "Bug Fix" "D73A4A"
+
+      - name: Create Milestones
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          gh issue create --title "Conectar à PokéAPI" --body "Script para coletar dados dos 150 Pokémon" --milestone "Sprint 1 – Coleta & Estruturação"
-          gh issue create --title "Estruturar tabelas" --body "Normalizar dados em Pokémon, Stats, Tipos, Habilidades" --milestone "Sprint 1 – Coleta & Estruturação"
-          gh issue create --title "Definir métrica de força" --body "HP + Ataque + Defesa" --milestone "Sprint 2 – Análise Exploratória"
-          gh issue create --title "Explorar correlação peso/altura vs stats" --body "Scatter plot e análise estatística" --milestone "Sprint 2 – Análise Exploratória"
-          gh issue create --title "Clusterizar Pokémon" --body "Usar K-means ou DBSCAN" --milestone "Sprint 3 – Análise Avançada"
-          gh issue create --title "Criar grafo de habilidades" --body "Usar NetworkX para mapear habilidades compartilhadas" --milestone "Sprint 3 – Análise Avançada"
-          gh issue create --title "Dashboard interativo" --body "Power BI, Tableau ou Plotly" --milestone "Sprint 4 – Visualização & Storytelling"
-          gh issue create --title "Documentar insights" --body "Relatório final com storytelling" --milestone "Sprint 4 – Visualização & Storytelling"
+
+          create_milestone () {
+
+            gh api \
+              --method POST \
+              repos/${{ github.repository }}/milestones \
+              -f title="$1" \
+              -f due_on="$2" \
+            || true
+          }
+
+          create_milestone "Sprint 1 - Coleta e Estruturação" "2026-05-31T23:59:59Z"
+          create_milestone "Sprint 2 - Análise Exploratória" "2026-06-30T23:59:59Z"
+          create_milestone "Sprint 3 - Análise Avançada" "2026-07-31T23:59:59Z"
+          create_milestone "Sprint 4 - Dashboard" "2026-08-31T23:59:59Z"
+
+      - name: Create Issues
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+
+          gh issue create \
+            --title "Conectar à PokéAPI" \
+            --body "Consumir dados da API." \
+            --label api \
+            --milestone "Sprint 1 - Coleta e Estruturação" \
+          || true
+
+          gh issue create \
+            --title "Estruturar modelo de dados" \
+            --body "Criar tabelas Pokémon, Stats, Types e Abilities." \
+            --label etl \
+            --milestone "Sprint 1 - Coleta e Estruturação" \
+          || true
+
+          gh issue create \
+            --title "Criar medidas DAX" \
+            --body "Desenvolver KPIs e métricas." \
+            --label powerbi \
+            --milestone "Sprint 2 - Análise Exploratória" \
+          || true
+
+          gh issue create \
+            --title "Criar Dashboard Geral" \
+            --body "Visão geral dos Pokémon." \
+            --label powerbi \
+            --milestone "Sprint 4 - Dashboard" \
+          || true
+
+          gh issue create \
+            --title "Criar Dashboard Comparativo" \
+            --body "Comparar dois Pokémon." \
+            --label powerbi \
+            --milestone "Sprint 4 - Dashboard" \
+          || true
+
+          gh issue create \
+            --title "Documentar Projeto" \
+            --body "Atualizar README e documentação técnica." \
+            --label documentation \
+          || true
+
+      - name: Finish
+        run: |
+          echo "Projeto configurado com sucesso!"
